@@ -134,6 +134,31 @@ if (filter = document.getElementById('ctl00_cphContent_trFilter')) {
 	})();
 }
 
+function makeValidTime(old_time) {
+	var parts = old_time.split(':');
+	var hours, minutes, seconds;
+	if (parts.length >= 1) {
+		hours = ( (parts[0] < 10 && parts[0].length < 2) ? "0" : "" ) + parts[0];
+	} else {
+		hours = '00';
+	}
+
+
+	if (parts.length >= 2) {
+		minutes = ( (parts[1] < 10 && parts[1].length < 2) ? "0" : "" ) + parts[1];
+	} else {
+		minutes = '00';
+	}
+
+
+	if (parts.length >= 3) {
+		seconds = ( (parts[2] < 10 && parts[2].length < 2) ? "0" : "" ) + parts[2];
+	} else {
+		seconds = '00';
+	}
+
+	return hours + ":" + minutes + ":" + seconds;
+}
 (function() {
 	if (document.getElementById('ctl00_cphContent_ctl00_txtDate_txtTextBox')
 		&& getParameterByName('ForceAction') != ''
@@ -166,6 +191,28 @@ if (filter = document.getElementById('ctl00_cphContent_trFilter')) {
 
 	}
 
+	// convert time input to html5 time input.
+	if (document.getElementById('ctl00_cphContent_ctl00_txtTime_txtTextBox')) {
+		$('#ctl00_cphContent_ctl00_txtTime_txtTextBox').each(function() {
+			var field_id = $(this).attr('id');
+
+			// add html5 time input field
+			$("<input type='time' />").attr({
+					name: this.name,
+					value: makeValidTime(this.value),
+					id: field_id+ "_html5",
+					step:900,
+					autocomplete: 'off'
+				}).insertBefore(this);
+
+			// add on change object to set old value
+			$("#"+field_id+ "_html5").change(function(){
+				$('#'+field_id).val($(this).val());
+			});
+			$(this).hide();
+		});
+
+	}
 	// add date picker to date field
 	if (document.getElementById('ctl00_cphContent_ctl00_txtDate_txtTextBox')) {
 		$.datepicker.setDefaults($.datepicker.regional[ "nl" ] );
