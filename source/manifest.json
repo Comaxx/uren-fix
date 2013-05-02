@@ -1,0 +1,46 @@
+{
+  "name": "Comaxx Uren fix",
+  "version": "1.4.0",
+  "manifest_version": 2,
+  "description": "Voor als nummers opzoeken je dag taak is....",
+  "homepage_url": "http://acknowledge.nl",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "default_locale": "en",
+  "options_page": "src/options.html",
+
+  "permissions": [
+    "http://uren.acknowledge.nl/*",
+    "tabs",
+	"storage"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "http://uren.acknowledge.nl/*"
+      ],
+      "js": [
+		"js/mustache.js",
+		"js/jquery-1.8.3.min.js",
+		"src/store.js",
+        "src/ack.js",
+		"css/popup.css"
+      ]
+    }
+  ],
+  "web_accessible_resources": [
+    "icons/trash.png",
+    "icons/edit.png",
+    "icons/save.png"
+  ],
+  "browser_action": {
+	"default_icon": {
+      "19": "icons/icon19.png"
+	},
+    "default_title": "Comaxx uren fix",
+    "default_popup": "src/popup.html"
+  }
+}
