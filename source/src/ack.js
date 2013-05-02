@@ -89,6 +89,38 @@ function getParameterByName(name)
 }
 
 
+function inputToMinutes(time_input) {
+	var time_in_minutes = '';
+	if (time_input.indexOf(':') > 0) {
+		var parts = time_input.split(":");
+		time_in_minutes = parseInt(parts[0] * 60) + parseInt(parts[1]);
+	} else if (time_input.indexOf(',') > 0) {
+		// {h},{%} -> h}.{%}
+		time_in_minutes = time_input.replace(",", ".") * 60;
+	} else {
+		// {h} -> {h}.0
+		// {h}.{%}
+		time_in_minutes = time_input * 60;
+	}
+
+	return time_in_minutes;
+}
+
+function minutesToHourString(minutes) {
+	if (minutes > 0) {
+		var worked_hours = Math.floor( minutes / 60);
+		var worked_minutes = minutes % 60;
+
+		if ((new String(worked_minutes)).length <2) {
+			worked_minutes = '0'+worked_minutes;
+		}
+		return worked_hours + ':' + worked_minutes;
+	} else {
+		return '';
+	}
+}
+
+
 if (filter = document.getElementById('ctl00_cphContent_trFilter')) {
 	// get info here because of event listner
 	var filter = filter = document.getElementById('ctl00_cphContent_trFilter');
@@ -161,6 +193,53 @@ function makeValidTime(old_time) {
 
 	return hours + ":" + minutes + ":" + seconds;
 }
+
+function today() {
+	var today_date = new Date();
+	var day = today_date.getDate();
+	var month = today_date.getMonth()+1;
+
+	if ((new String(day)).length <2) {
+			day = '0'+day;
+	}
+	if ((new String(month)).length <2) {
+			month = '0'+month;
+	}
+
+	var today_string =  day +'-'+ month +'-'+ today_date.getFullYear();
+
+	return today_string;
+}
+
+function setNewStartTime(duration_old_in_minutes) {
+	console.log('Try set time');
+	var duration_in_minutes = inputToMinutes($('#ctl00_cphContent_ctl00_txtDuration_txtTextBox').val());
+	var start_time_in_minutes = inputToMinutes($('#ctl00_cphContent_ctl00_txtTime_txtTextBox').val());
+	var date = $('#ctl00_cphContent_ctl00_txtDate_txtTextBox').val();
+
+
+
+	// Convert minutes to hour string
+	if ((duration_old_in_minutes != '0' || start_time_in_minutes == 510) && date == today() ) {
+		if (start_time_in_minutes == 510) {
+			start_time_in_minutes = ((new Date()).getHours()* 60) + (new Date()).getMinutes();
+		}
+		// calculate new minute (start time - diff between old & new duration)
+		var new_start_time_in_minutes = start_time_in_minutes - (duration_in_minutes - duration_old_in_minutes);
+
+		var hour_string = minutesToHourString(new_start_time_in_minutes)
+		console.log('new value:' + hour_string);
+		$('#ctl00_cphContent_ctl00_txtTime_txtTextBox').val(hour_string);
+		$('#ctl00_cphContent_ctl00_txtTime_txtTextBox_html5').val(makeValidTime(hour_string));
+
+		duration_old_in_minutes = duration_in_minutes; // replace old value
+	} else {
+		console.log('No time set ' + duration_old_in_minutes + ' ' + start_time_in_minutes + ' ' +today());
+	}
+	return duration_old_in_minutes;
+}
+
+
 (function() {
 	// convert time input to html5 time input.
 	if (document.getElementById('ctl00_cphContent_ctl00_txtTime_txtTextBox')) {
@@ -250,6 +329,30 @@ function makeValidTime(old_time) {
 			}
 		});
 
+		var duration_timer;
+		var duration_old_in_minutes = inputToMinutes($('#ctl00_cphContent_ctl00_txtDuration_txtTextBox').val());
+		$('#ctl00_cphContent_ctl00_txtDuration_txtTextBox').keyup(function(e){
+			// options
+			// {h} -> {h}.0
+			// {h}:{m}
+			// {h},{%} -> {h}.{%}
+			// {h}.{%}
+			clearTimeout(duration_timer); // reset timer
+
+			var key = e.which || e.keyCode;
+			if (key == 13) { // 13 is enter
+				duration_old_in_minutes = setNewStartTime(duration_old_in_minutes);
+				return true;
+			} else if(key == 27) { // 27 is esc
+				//duration_old_in_minutes= setNewStartTime(duration_old_in_minutes);
+				return true;
+			} else {
+				duration_timer = setTimeout(function() {
+					duration_old_in_minutes = setNewStartTime(duration_old_in_minutes);
+				}, 1000);
+			}
+
+		});
 	}
 })();
 
