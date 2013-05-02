@@ -163,6 +163,14 @@ if (filter = document.getElementById('ctl00_cphContent_trFilter')) {
 				return false;
 			}
 		});
+
+	}
+
+	// add date picker to date field
+	if (document.getElementById('ctl00_cphContent_ctl00_txtDate_txtTextBox')) {
+		$.datepicker.setDefaults($.datepicker.regional[ "nl" ] );
+		$( "#ctl00_cphContent_ctl00_txtDate_txtTextBox" ).datepicker();
+
 	}
 })();
 
