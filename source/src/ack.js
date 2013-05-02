@@ -38,11 +38,10 @@ function AddProjectToGroup() {
 	$(this).addClass('disabled');
 	var project_id = document.getElementById('ctl00_cphContent_ctl00_txtProNo_txtTextBox').value;
 	var select_box = document.getElementById('ctl00_cphContent_ctl00_ddlCustomers_ddlDropDownList');
-	//var project_name = select_box.options[select_box.selectedIndex].text;
-	var project_name = $('#ctl00_cphContent_ctl00_txtDescription_txtTextBox').val();
-	if (project_name == '' || project_name == undefined) {
-		project_name = select_box.options[select_box.selectedIndex].text;
-	}
+
+	// project_name = [{company name}] {project description}
+	var project_name = '[ ' + select_box.options[select_box.selectedIndex].text + ' ]  ' + $('#ctl00_cphContent_ctl00_txtDescription_txtTextBox').val();
+
 	var project_key = getParameterByName('Key');
 	var group_name = $('#add_project_to_group').val();
 
