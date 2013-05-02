@@ -53,6 +53,20 @@ function toTree(data) {
 function save_options() {
 	console.log('save_options');
 
+	var options = {};
+	var save_options = false;
+	if ($('#time_increment')) {
+		options.time_increment = $('#time_increment').val() * 60;
+		save_options = true;
+	}
+	if ($('#start_time')) {
+		options.start_time = $('#start_time').val();
+		save_options = true;
+	}
+
+	if(save_options) {
+		storeOptions(options);
+	}
 	// save options
 	var object = document.getElementById("config");
 	links = JSON.parse(object.value);
@@ -210,10 +224,33 @@ document.querySelector('#input_add_group_0').addEventListener('keyup', function 
 
 $(document).ready(function() {
 	restore_options();
+	//var options = getOptions();
+	//options = JSON.parse(JSON.stringify(options));
+
+	chrome.storage.sync.get("time_increment", function(r) {
+			var time_increment = r["time_increment"];
+			if (time_increment == undefined) {
+				time_increment= 900;
+				storeOptions({'time_increment': time_increment});
+			}
+			$('#time_increment').val(time_increment/60);
+	});
+	chrome.storage.sync.get("start_time", function(r) {
+			var start_time = r["start_time"];
+			if (start_time == undefined) {
+				start_time= "08:30";
+				storeOptions({'start_time': start_time});
+			}
+			$('#start_time').val(start_time);
+	});
 
 	// add event listener
 	chrome.storage.onChanged.addListener(function(changes, namespace) {
-		restore_options();
+		for (key in changes) {
+			if(key == 'Acknowledge.links') {
+				restore_options();
+			}
+		}
 	});
 
 	// edit group by element

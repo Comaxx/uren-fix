@@ -126,8 +126,10 @@ if (filter = document.getElementById('ctl00_cphContent_trFilter')) {
 		// add event listener
 		chrome.storage.onChanged.addListener(function(changes, namespace) {
 			for (key in changes) {
-				var storageChange = changes[key];
-				printLinks(storageChange.newValue);
+				if (key == "Acknowledge.links") {
+					var storageChange = changes[key];
+					printLinks(storageChange.newValue);
+				}
 			}
 		});
 
@@ -160,6 +162,35 @@ function makeValidTime(old_time) {
 	return hours + ":" + minutes + ":" + seconds;
 }
 (function() {
+	// convert time input to html5 time input.
+	if (document.getElementById('ctl00_cphContent_ctl00_txtTime_txtTextBox')) {
+		$('#ctl00_cphContent_ctl00_txtTime_txtTextBox').each(function() {
+			var field_id = $(this).attr('id');
+
+			// add html5 time input field
+			$("<input type='time' />").attr({
+					name: this.name,
+					value: makeValidTime(this.value),
+					id: field_id+ "_html5",
+					step:900,
+					autocomplete: 'off'
+				}).insertBefore(this);
+
+			// add on change object to set old value
+			$("#"+field_id+ "_html5").change(function(){
+				$('#'+field_id).val($(this).val());
+			});
+			$(this).hide();
+		});
+
+	}
+	// add date picker to date field
+	if (document.getElementById('ctl00_cphContent_ctl00_txtDate_txtTextBox')) {
+		$.datepicker.setDefaults($.datepicker.regional[ "nl" ] );
+		$( "#ctl00_cphContent_ctl00_txtDate_txtTextBox" ).datepicker();
+
+	}
+
 	if (document.getElementById('ctl00_cphContent_ctl00_txtDate_txtTextBox')
 		&& getParameterByName('ForceAction') != ''
 		&& getParameterByName('Call') == 'wucMutateProjectLineActivity.ascx') {
@@ -189,34 +220,35 @@ function makeValidTime(old_time) {
 			}
 		});
 
-	}
-
-	// convert time input to html5 time input.
-	if (document.getElementById('ctl00_cphContent_ctl00_txtTime_txtTextBox')) {
-		$('#ctl00_cphContent_ctl00_txtTime_txtTextBox').each(function() {
-			var field_id = $(this).attr('id');
-
-			// add html5 time input field
-			$("<input type='time' />").attr({
-					name: this.name,
-					value: makeValidTime(this.value),
-					id: field_id+ "_html5",
-					step:900,
-					autocomplete: 'off'
-				}).insertBefore(this);
-
-			// add on change object to set old value
-			$("#"+field_id+ "_html5").change(function(){
-				$('#'+field_id).val($(this).val());
-			});
-			$(this).hide();
+		// set start time from config
+		chrome.storage.sync.get("start_time", function(r) {
+			var start_time = r["start_time"];
+			if (start_time == undefined) {
+				start_time= "08:30";
+				storeOptions({'start_time': start_time});
+			}
+			$('#ctl00_cphContent_ctl00_txtTime_txtTextBox_html5').val(start_time);
+			$('#ctl00_cphContent_ctl00_txtTime_txtTextBox').val(start_time);
 		});
 
-	}
-	// add date picker to date field
-	if (document.getElementById('ctl00_cphContent_ctl00_txtDate_txtTextBox')) {
-		$.datepicker.setDefaults($.datepicker.regional[ "nl" ] );
-		$( "#ctl00_cphContent_ctl00_txtDate_txtTextBox" ).datepicker();
+		chrome.storage.sync.get("time_increment", function(r) {
+			var time_increment = r["time_increment"];
+			if (time_increment == undefined) {
+				time_increment= "900";
+				storeOptions({'time_increment': time_increment});
+			}
+			$('#ctl00_cphContent_ctl00_txtTime_txtTextBox_html5').attr('step',time_increment);
+		});
+
+		// add event listener
+		chrome.storage.onChanged.addListener(function(changes, namespace) {
+			for (key in changes) {
+				if (key == "time_increment") {
+					var storageChange = changes[key];
+					$('#ctl00_cphContent_ctl00_txtTime_txtTextBox_html5').attr('step',storageChange.newValue);
+				}
+			}
+		});
 
 	}
 })();
@@ -247,8 +279,10 @@ function makeValidTime(old_time) {
 
 			chrome.storage.onChanged.addListener(function(changes, namespace) {
 				for (key in changes) {
-					var storageChange = changes[key];
-					printAddButton(storageChange.newValue);
+					if (key == "Acknowledge.links") {
+						var storageChange = changes[key];
+						printAddButton(storageChange.newValue);
+					}
 				}
 			});
 

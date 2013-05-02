@@ -18,3 +18,7 @@ function getLinks() {
 function storeLinks(links) {
 	chrome.storage.sync.set({"Acknowledge.links": links}, function() { console.log('saved');});
 }
+
+function storeOptions(options) {
+	chrome.storage.sync.set(options, function() { console.log('saved options');});
+}
