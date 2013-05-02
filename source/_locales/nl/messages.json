@@ -1,0 +1,71 @@
+{
+  "i18n_save": {
+    "message":"Opslaan"
+    ,"description":"Save button"
+  },
+  "i18n_save_successful": {
+    "message":"Opties zijn successvol opgeslagen"
+    ,"description":"successful response to save"
+  },
+  "i18n_group": {
+    "message":"groep"
+    ,"description":"group"
+  },
+  "i18n_add_new_group": {
+    "message":"Groep toevoegen"
+    ,"description":"add new groupbutton"
+  },
+  "i18n_project": {
+    "message":"project"
+    ,"description":"project"
+  },
+  "i18n_delete_are_you_sure": {
+    "message":"Weet u zeker dat u deze $type$ regel wilt verwijderen?"
+    ,"description":"Generic are you sure delete template",
+    "placeholders": {
+      "type": {
+        "content": "$1",
+        "example": "Group"
+      }
+    }
+  },
+  "i18n_select_option": {
+    "message":"--Selecteer--"
+    ,"description":"default select option, suggest selecting something"
+  },
+  "i18n_no_group_selected": {
+    "message":"Geen groep geselecteert"
+    ,"description":"alert message when no group is selected"
+  },
+  "i18n_failed_to_add": {
+    "message":"Fout bij toevoegen van regel"
+    ,"description":"alert message when failure"
+  },
+  "i18n_successful_project_add": {
+    "message":"Successvol toegevoegd: $project$ aan: $group$."
+    ,"description":"alert message on suc6 add project to group",
+    "placeholders": {
+      "project": {
+        "content": "$1",
+        "example": "project_name"
+      },
+      "group": {
+        "content": "$2",
+        "example": "group_name"
+      }
+    }
+  },
+  "i18n_advanced_options": {
+    "message":"Geadvanceerde opties"
+    ,"description":"Advanced options link"
+  },
+  "i18n_add": {
+    "message":"Toevoegen"
+    ,"description":"Add button"
+  },
+  "i18n_projects": {
+    "message":"Projecten"
+    ,"description":"Projects"
+  }
+}
+

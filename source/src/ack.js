@@ -163,6 +163,16 @@ if (filter = document.getElementById('ctl00_cphContent_trFilter')) {
 				return false;
 			}
 		});
+
+//		var fileref=document.createElement("link");
+//		fileref.setAttribute("rel", "stylesheet");
+//		fileref.setAttribute("type", "text/css");
+//		fileref.setAttribute("href", "css/ui-lightness/jquery-ui-1.10.2.custom.min.css");
+//		document.getElementsByTagName("head")[0].appendChild(fileref);
+
+		$.datepicker.setDefaults($.datepicker.regional[ "nl" ] );
+		$( "#ctl00_cphContent_ctl00_txtDate_txtTextBox" ).datepicker();
+
 	}
 })();
 

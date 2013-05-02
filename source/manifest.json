@@ -1,6 +1,6 @@
 {
   "name": "Comaxx Uren fix",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "manifest_version": 2,
   "description": "Voor als nummers opzoeken je dag taak is....",
   "homepage_url": "http://acknowledge.nl",
@@ -25,16 +25,27 @@
       "js": [
 		"js/mustache.js",
 		"js/jquery-1.8.3.min.js",
+		"js/jquery-ui-1.10.2.custom.min.js",
+		"js/jquery.ui.datepicker-nl.js",
 		"src/store.js",
         "src/ack.js",
 		"css/popup.css"
-      ]
+      ],
+	  "css": [ "css/ui-lightness/jquery-ui-1.10.2.custom.min.css" ]
     }
   ],
   "web_accessible_resources": [
     "icons/trash.png",
     "icons/edit.png",
-    "icons/save.png"
+    "icons/save.png",
+	"css/ui-lightness/jquery-ui-1.10.2.custom.min.css",
+	"images/ui-bg_highlight-soft_100_eeeeee_1x100.png",
+	"images/ui-bg_gloss-wave_35_f6a828_500x100.png",
+	"images/ui-icons_ffffff_256x240.png",
+	"images/ui-bg_glass_100_f6f6f6_1x400.png",
+	"images/ui-bg_highlight-soft_75_ffe45c_1x100.png",
+	"images/ui-bg_glass_100_fdf5ce_1x400.png",
+	"images/ui-icons_ef8c08_256x240.png"
   ],
   "browser_action": {
 	"default_icon": {
