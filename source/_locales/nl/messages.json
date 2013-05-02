@@ -1,18 +1,18 @@
 {
   "i18n_save": {
-    "message":"Save"
+    "message":"Opslaan"
     ,"description":"Save button"
   },
   "i18n_save_successful": {
-    "message":"Options saved successful"
+    "message":"Opties zijn successvol opgeslagen"
     ,"description":"successful response to save"
   },
   "i18n_group": {
-    "message":"group"
+    "message":"groep"
     ,"description":"group"
   },
   "i18n_add_new_group": {
-    "message":"Add group"
+    "message":"Groep toevoegen"
     ,"description":"add new groupbutton"
   },
   "i18n_project": {
@@ -20,7 +20,7 @@
     ,"description":"project"
   },
   "i18n_delete_are_you_sure": {
-    "message":"Are you sure you want to delete a $type$ record?"
+    "message":"Weet u zeker dat u deze $type$ regel wilt verwijderen?"
     ,"description":"Generic are you sure delete template",
     "placeholders": {
       "type": {
@@ -30,41 +30,42 @@
     }
   },
   "i18n_select_option": {
-    "message":"--Select--"
+    "message":"--Selecteer--"
     ,"description":"default select option, suggest selecting something"
   },
   "i18n_no_group_selected": {
-    "message":"No group selected"
+    "message":"Geen groep geselecteert"
     ,"description":"alert message when no group is selected"
   },
   "i18n_failed_to_add": {
-    "message":"Failed to add record"
+    "message":"Fout bij toevoegen van regel"
     ,"description":"alert message when failure"
   },
   "i18n_successful_project_add": {
-    "message":"Successfully add: $project_name$ to: $group_name$"
+    "message":"Successvol toegevoegd: $project$ aan: $group$."
     ,"description":"alert message on suc6 add project to group",
     "placeholders": {
-      "project_name": {
+      "project": {
         "content": "$1",
         "example": "project_name"
       },
-      "group_name": {
+      "group": {
         "content": "$2",
         "example": "group_name"
       }
     }
   },
   "i18n_advanced_options": {
-    "message":"Advanced options"
+    "message":"Geadvanceerde opties"
     ,"description":"Advanced options link"
   },
   "i18n_add": {
-    "message":"Add"
+    "message":"Toevoegen"
     ,"description":"Add button"
   },
   "i18n_projects": {
-    "message":"Projects"
+    "message":"Projecten"
     ,"description":"Projects"
   }
 }
+
