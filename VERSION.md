@@ -1,0 +1,23 @@
+Uren-Fix
+========
+
+Uren-Fix 1.4
+--------
+- changed option page.
+- added pop-up icon & page for easy acces
+
+Uren-Fix 1.3
+--------
+- Changed default project label, now includes Company and project
+
+Uren-Fix 1.2
+--------
+- Added option page.
+
+Uren-Fix 1.1
+--------
+- Changed to chrome plugin framework
+
+Uren-Fix 1.0
+--------
+- Initial version by Bart Haalstra
