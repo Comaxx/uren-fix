@@ -1,6 +1,17 @@
 Uren-Fix
 ========
 
+
+
+Uren-Fix 1.4.2
+--------
+- Added language support NL - EN
+- Added jQuery UI datepicker
+- Added html5 time input for start time
+- Added advanced option to change start time
+- Added advanced option to change html5 time step
+- Added auto set start time to now - duration
+
 Uren-Fix 1.4
 --------
 - changed option page.
