@@ -2,7 +2,7 @@ function printLinks(links) {
 	// put links in data object
 	var data = {groups: links};
 	// use this template to format
-	var template = '{{#groups}}<b>{{name}}</b><ul>' +
+	var template = '<h1>Comaxx Uren Fix</h1>{{#groups}}<b>{{name}}</b><ul>' +
 			'{{#projects}}'+
 				'<li><a href="javascript:newWindow(\'webMutate.aspx?Call=wucMutateProjectActivity.ascx&Key={{key}}&Action=Edit&ref=Urenfix\')">{{name}}</a></li>'+
 			'{{/projects}}'+
@@ -22,7 +22,7 @@ function printAddButton(links) {
 	// use this template to format
 	var template = ''+
 	'<select id="add_project_to_group" style="margin-top:8px;margin-left:10px;">'+
-		'<option id="-1">--Selecteer--</option>'+
+		'<option id="-1">'+chrome.i18n.getMessage('i18n_select_option')+'</option>'+
 		'{{#groups}}<option>{{name}}</option>{{/groups}}'+
 	'</select>'+
 	'<img id="add_project_to_group_button"  class="add_project_to_group_button" src="Components/Images/btnNew26.gif" style="border-width:0px;padding-top:5px;margin-left:5px;" align="top" />';
@@ -45,11 +45,10 @@ function AddProjectToGroup() {
 	}
 	var project_key = getParameterByName('Key');
 	var group_name = $('#add_project_to_group').val();
-	//console.log({"key":project_key,"name":project_id + ' - ' + project_name});
 
 	// if no group selected -> exit
-	if (group_name == '--Selecteer--') {
-		alert('Geen groep geselecteer');
+	if (group_name == chrome.i18n.getMessage('i18n_select_option')) {
+		alert(chrome.i18n.getMessage('i18n_no_group_selected')+'!');
 		$(this).removeClass('disabled');
 		return;
 	}
@@ -67,10 +66,10 @@ function AddProjectToGroup() {
 		});
 
 		if (!is_succes) {
-			alert('failed to add.');
+			alert(chrome.i18n.getMessage('i18n_failed_to_add')+'!');
 		} else {
 			storeLinks(links);
-			alert('Toegevoegd: ' + project_name + ' Aan: ' + group_name);
+			alert(chrome.i18n.getMessage('i18n_successful_project_add', [project_name, group_name]) +'.');
 		}
 
 
@@ -202,16 +201,6 @@ if (filter = document.getElementById('ctl00_cphContent_trFilter')) {
 		})();
 	}
 })();
-//(function() {
-//	if (filter = document.getElementById('ctl00_wucKeepAlive1_UpdatePanel1')) {
-//		var html = $('#ctl00_wucKeepAlive1_UpdatePanel1').html();
-//		html = '<a href="'+chrome.extension.getURL("options.html")+'">Uren fix options</a>' + html;
-//		$('#ctl00_wucKeepAlive1_UpdatePanel1').html(html);
-////		chrome.tabs.create({
-////			url: "options/index.html"
-////		});
-//	}
-//})();
 
 var updateScript = document.createElement('script');
 updateScript.type = 'text/javascript';

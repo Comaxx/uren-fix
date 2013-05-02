@@ -46,20 +46,21 @@ function toTree(data) {
 
 	html += '</ul>';
 
-	//html += '<span style="color:red;" id="add_group_0" class="add_group">Add new group</span>';
-
+	// set HTML
 	document.getElementById("tree").innerHTML = html;
 }
 
 function save_options() {
 	console.log('save_options');
+
+	// save options
 	var object = document.getElementById("config");
 	links = JSON.parse(object.value);
 	storeLinks(links)
 
 	// Update status to let user know options were saved.
 	var status = document.getElementById("status");
-	status.innerHTML = "Options Saved.";
+	status.innerHTML = chrome.i18n.getMessage('i18n_save_successful')+".";
 	setTimeout(function() {
 		status.innerHTML = "";
 	}, 750);
@@ -129,7 +130,7 @@ function activateEditGroup(group_id) {
 	var value = $('#'+group_id).html(); // grab current html value
 
 	var html = '<input type="text" id="input_'+group_id+'" value="'+value+'">';
-	html += ' <span id="save_'+group_id+'"> <img src="../icons/save.png" /> Save</span>';
+	html += ' <span id="save_'+group_id+'"> <img src="../icons/save.png" /> '+chrome.i18n.getMessage('i18n_save')+'</span>';
 
 	$('#'+group_id).html(html);
 	$('#input_'+group_id).focus();
@@ -156,7 +157,7 @@ function activateEditProject(project_id) {
 	var value = $('#'+project_id).html(); // grab current html value
 
 	var html = '<input type="text" id="input_'+project_id+'" value="'+value+'">';
-	html += ' <span id="save_'+project_id+'"> <img src="../icons/save.png" /> <strong>Save</strong></span>';
+	html += ' <span id="save_'+project_id+'"> <img src="../icons/save.png" /> <strong>'+chrome.i18n.getMessage('i18n_save')+'</strong></span>';
 
 	$('#'+project_id).html(html);
 
@@ -257,7 +258,7 @@ $(document).ready(function() {
 	// dell group button
     $('.del_group:not(.disabled)').live('click', function() {
 		console.log('Del group');
-		if (confirm('Delete group record?')) {
+		if (confirm(chrome.i18n.getMessage('i18n_delete_are_you_sure', chrome.i18n.getMessage('i18n_group')))) {
 			$(this).addClass('disabled'); // disable adding a nother input box.
 			var id = $(this).attr('id'); // grab element ID
 
@@ -279,7 +280,7 @@ $(document).ready(function() {
 	// dell project button
     $('.del_project:not(.disabled)').live('click', function() {
 		console.log('Del project');
-		if (confirm('Delete project record?')) {
+		if (confirm(chrome.i18n.getMessage('i18n_delete_are_you_sure', chrome.i18n.getMessage('i18n_project')))) {
 			$(this).addClass('disabled'); // disable adding a nother input box.
 			var id = $(this).attr('id'); // grab element ID
 
@@ -298,5 +299,11 @@ $(document).ready(function() {
 
 	$('#advanced_option_link').live('click', function() {
 		$('#advanced_info').toggle();
+	});
+
+	$("[i18n]:not(.i18n-replaced)").each(function() {
+		$(this).html(chrome.i18n.getMessage($(this).attr("i18n")));
+		// add class to know wich ones are done
+		$(this).addClass("i18n-replaced");
 	});
  });
