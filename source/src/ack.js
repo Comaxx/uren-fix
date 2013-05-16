@@ -1,62 +1,230 @@
-function printLinks(links) {
-	// put links in data object
-	var data = {groups: links};
-	// use this template to format
-	var template = '<h1>Comaxx Uren Fix</h1>{{#groups}}<b>{{name}}</b><ul>' +
-			'{{#projects}}'+
-				'<li><a href="javascript:newWindow(\'webMutate.aspx?Call=wucMutateProjectActivity.ascx&Key={{key}}&Action=Edit&ref=Urenfix\')">{{name}}</a></li>'+
-			'{{/projects}}'+
-		'</ul>{{/groups}}';
 
-	// convert to html
-	var html = Mustache.to_html(template, data);
-	// add html
-	document.getElementById('urenfix').innerHTML = html;
+// urenfix
+(function ($, d, w, undefined) {
+    // d = document, w= window, u = undefined
 
-}
 
-function printAddButton(links) {
-	// put links in data object
-	var data = {groups: links};
+	// default values
+	var _settings  = {
+		"start_time": "08:30:10",
+		"time_increment": "900",
+		"projects": [
+					{
+						name: 'Overhead',
+						projects: [],
+					},
+					{
+						name: 'Projects',
+						projects: [],
+					}
+				]
+	};
 
-	// use this template to format
-	var template = ''+
-	'<select id="add_project_to_group" style="margin-top:8px;margin-left:10px;">'+
-		'<option id="-1">'+chrome.i18n.getMessage('i18n_select_option')+'</option>'+
-		'{{#groups}}<option>{{name}}</option>{{/groups}}'+
-	'</select>'+
-	'<img id="add_project_to_group_button"  class="add_project_to_group_button" src="Components/Images/btnNew26.gif" style="border-width:0px;padding-top:5px;margin-left:5px;" align="top" />';
+	// keep track of loaded vars
+	var _loaded = {
+		"projects": false,
+		"start_time": false,
+		"time_increment": false
+	};
 
-	// convert to html
-	var html = Mustache.to_html(template, data);
-
-	// add html
-	document.getElementById('add_block').innerHTML = html;
-}
-
-function AddProjectToGroup() {
-	$(this).addClass('disabled');
-	var project_id = document.getElementById('ctl00_cphContent_ctl00_txtProNo_txtTextBox').value;
-	var select_box = document.getElementById('ctl00_cphContent_ctl00_ddlCustomers_ddlDropDownList');
-
-	// project_name = [{company name}] {project description}
-	var project_name = '[ ' + select_box.options[select_box.selectedIndex].text + ' ]  ' + $('#ctl00_cphContent_ctl00_txtDescription_txtTextBox').val();
-
-	var project_key = getParameterByName('Key');
-	var group_name = $('#add_project_to_group').val();
-
-	// if no group selected -> exit
-	if (group_name == chrome.i18n.getMessage('i18n_select_option')) {
-		alert(chrome.i18n.getMessage('i18n_no_group_selected')+'!');
-		$(this).removeClass('disabled');
-		return;
+	var _templates = {
+		"project_links" : '<h1>Comaxx Uren Fix</h1>{{#groups}}<b>{{name}}</b><ul>' +
+				'{{#projects}}'+
+					'<li><a href="javascript:newWindow(\'webMutate.aspx?Call=wucMutateProjectActivity.ascx&Key={{key}}&Action=Edit&ref=Urenfix\')">{{name}}</a></li>'+
+				'{{/projects}}'+
+			'</ul>{{/groups}}',
+		"add_project_button" : '<select id="add_project_to_group" style="margin-top:8px;margin-left:10px;">'+
+			'<option id="-1">'+chrome.i18n.getMessage('i18n_select_option')+'</option>'+
+			'{{#groups}}<option>{{name}}</option>{{/groups}}'+
+		'</select>'+
+		'<img id="add_project_to_group_button"  class="add_project_to_group_button" src="Components/Images/btnNew26.gif" style="border-width:0px;padding-top:5px;margin-left:5px;" align="top" />'
 	}
 
-	// save
-	chrome.storage.sync.get("Acknowledge.links", function(r) {
-		var links = r["Acknowledge.links"];
+	$.fn.urenFix = function( options ) {
+		console.log('call');
+
+		// overide defaults
+		_settings = $.extend(_settings, options );
+
+		// load Chrome data
+		$.fn.urenFix.loadData();
+
+		// activate Event listeners for Chrome data
+		$.fn.urenFix.activateEventListeners();
+
+		return this;
+	};
+
+	$.fn.urenFix.loadData = function() {
+		// set start time from config
+		chrome.storage.sync.get("start_time", function(r) {
+			var start_time = r["start_time"];
+			if (start_time != undefined) {
+				$.fn.urenFix.setStartTime(start_time);
+				_loaded.start_time = true;
+			}
+		});
+
+		chrome.storage.sync.get("time_increment", function(r) {
+			var time_increment = r["time_increment"];
+			if (time_increment != undefined) {
+				$.fn.urenFix.setTimeIncrement(time_increment);
+			}
+		});
+
+		chrome.storage.sync.get("Acknowledge.links", function(r) {
+				var links = r["Acknowledge.links"];
+				if(links != undefined) {
+					$.fn.urenFix.setProjects(r["Acknowledge.links"]);
+					$.fn.urenFix.printAddButton();
+				}
+
+			});
+	};
+
+	$.fn.urenFix.activateEventListeners = function() {
+		// add event listener
+		chrome.storage.onChanged.addListener(function(changes, namespace) {
+			for (key in changes) {
+
+				// time increment
+				if (key == "time_increment") {
+					var storageChange = changes[key];
+					$.fn.urenFix.setTimeIncrement(storageChange.newValue);
+				// start time
+				} else if (key == "start_time") {
+					var storageChange = changes[key];
+					$.fn.urenFix.setStartTime(storageChange.newValue);
+				} else if (key == "Acknowledge.links") {
+					var storageChange = changes[key];
+					$.fn.urenFix.setProjects(storageChange.newValue);
+					$.fn.urenFix.printAddButton();
+
+				}
+			}
+		});
+	};
+
+	$.fn.urenFix.setStartTime = function(start_time) {
+		console.log('setStartTime');
+		_settings.start_time = start_time;
+		_loaded.start_time = true;
+	};
+
+	$.fn.urenFix.setTimeIncrement = function(time_increment) {
+		console.log('setTimeIncrement');
+		_settings.time_increment = time_increment;
+		_loaded.time_increment = true;
+	};
+
+	$.fn.urenFix.setProjects = function(projects) {
+		console.log('setProjects');
+		_settings.projects = projects;
+		_loaded.projects = true;
+
+		// update links
+		$.fn.urenFix.printLinks();
+	};
+
+	$.fn.urenFix.printLinks = function () {
+		console.log('printLinks');
+
+		// only on the correct pages
+		if (document.getElementById('ctl00_cphContent_trFilter') != undefined) {
+			// make sure element exists
+			if (document.getElementById('urenfix') == undefined) {
+				// get info here because of event listner
+				var filter = document.getElementById('ctl00_cphContent_trFilter');
+				// create new table row for data
+				var	tr = document.createElement('tr');
+				var	td = document.createElement('td');
+				td.id = 'urenfix';
+				tr.appendChild(td);
+				filter.parentNode.insertBefore(tr, filter.nextSibling);
+			}
+
+			// put links in data object
+			var data = {groups: _settings.projects};
+
+			// convert to html
+			var html = Mustache.to_html(_templates.project_links, data);
+
+			// add html
+			document.getElementById('urenfix').innerHTML = html;
+
+		}
+	}
+
+	$.fn.urenFix.printAddButton = function() {
+		console.log('printAddButton');
+
+		// make sure where on project page
+		if(w.location.href.indexOf('wucMutateProjectActivity.ascx') > 0) {
+
+			if (document.getElementById('add_block') == undefined) {
+				var add_block = document.createElement('div');
+				add_block.style.float = 'left';
+				add_block.id = 'add_block';
+				add_block.innerHTML = ''; //div will be filled by printAddButton
+				$('.wucMutateButtons').append(add_block);
+			}
+
+			// put links in data object
+			var data = {groups: _settings.projects};
+
+			// convert to html
+			var html = Mustache.to_html(_templates.add_project_button, data);
+
+			// add html
+			document.getElementById('add_block').innerHTML = html;
+
+			// add trigger here, due to repaint options
+			// TODO: fix double binding of event, now every time this function is called the group is added
+			// reproduce by adding a project and then selecting no group but clicking add
+			$('.add_project_to_group_button:not(.disabled)').live('click', $.fn.urenFix.AddProjectToGroup);
+		}
+	}
+
+	$.fn.urenFix.getParameterByName = function(name) {
+		name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+		var regexS = "[\\?&]" + name + "=([^&#]*)";
+		var regex = new RegExp(regexS);
+		var results = regex.exec(window.location.search);
+		if(results == null) {
+			return "";
+		} else {
+			return decodeURIComponent(results[1].replace(/\+/g, " "));
+		}
+	};
+
+	$.fn.urenFix.AddProjectToGroup = function() {
+		// prevent double
+		$(this).addClass('disabled');
+
+		// get project id
+		var project_id = document.getElementById('ctl00_cphContent_ctl00_txtProNo_txtTextBox').value;
+
+		// get project_name = [{company name}] {project description}
+		var select_box = document.getElementById('ctl00_cphContent_ctl00_ddlCustomers_ddlDropDownList');
+		var project_name = '[ ' + select_box.options[select_box.selectedIndex].text + ' ]  ' + $('#ctl00_cphContent_ctl00_txtDescription_txtTextBox').val();
+
+		// project KEY
+		var project_key = $().urenFix.getParameterByName('Key');
+
+		// group name
+		var group_name = $('#add_project_to_group').val();
+
+		// if no group selected -> exit
+		if (group_name == chrome.i18n.getMessage('i18n_select_option')) {
+			alert(chrome.i18n.getMessage('i18n_no_group_selected')+'!');
+			$(this).removeClass('disabled');
+			return;
+		}
+
+		// save
+
 		var is_succes = false;
-		jQuery.each(links, function(i,val) {
+		jQuery.each(_settings.projects, function(i,val) {
 			if (val.name == group_name) {
 				// TODO: add check if project allready exists.
 				val.projects.push ({"key":project_key,"name":project_id + ' - ' + project_name});
@@ -67,26 +235,15 @@ function AddProjectToGroup() {
 		if (!is_succes) {
 			alert(chrome.i18n.getMessage('i18n_failed_to_add')+'!');
 		} else {
-			storeLinks(links);
+			storeLinks(_settings.projects);
 			alert(chrome.i18n.getMessage('i18n_successful_project_add', [project_name, group_name]) +'.');
 		}
+	};
 
+} (jQuery, document, window));
 
-	});
-}
+$().urenFix({});
 
-function getParameterByName(name)
-{
-	name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
-	var regexS = "[\\?&]" + name + "=([^&#]*)";
-	var regex = new RegExp(regexS);
-	var results = regex.exec(window.location.search);
-	if(results == null) {
-		return "";
-	} else {
-		return decodeURIComponent(results[1].replace(/\+/g, " "));
-	}
-}
 
 
 function inputToMinutes(time_input) {
@@ -118,54 +275,6 @@ function minutesToHourString(minutes) {
 	} else {
 		return '';
 	}
-}
-
-
-if (filter = document.getElementById('ctl00_cphContent_trFilter')) {
-	// get info here because of event listner
-	var filter = filter = document.getElementById('ctl00_cphContent_trFilter');
-	//var links = getLinks();
-
-	// create new table row for data
-	var	tr = document.createElement('tr');
-	var	td = document.createElement('td');
-	td.id = 'urenfix';
-	tr.appendChild(td);
-	filter.parentNode.insertBefore(tr, filter.nextSibling);
-
-
-	(function() {
-		chrome.storage.sync.get("Acknowledge.links", function(r) {
-			var links = r["Acknowledge.links"];
-			if(links == undefined) {
-				links = [
-					{
-						name: 'Overhead',
-						projects: [],
-					},
-					{
-						name: 'Projects',
-						projects: [],
-					}
-				];
-				storeLinks(links);
-			} else {
-				printLinks(r["Acknowledge.links"]);
-			}
-
-		});
-
-		// add event listener
-		chrome.storage.onChanged.addListener(function(changes, namespace) {
-			for (key in changes) {
-				if (key == "Acknowledge.links") {
-					var storageChange = changes[key];
-					printLinks(storageChange.newValue);
-				}
-			}
-		});
-
-	})();
 }
 
 function makeValidTime(old_time) {
@@ -353,43 +462,6 @@ function setNewStartTime(duration_old_in_minutes) {
 			}
 
 		});
-	}
-})();
-
-(function() {
-	// check if wehere on a project page.
-	// if so add a menu item for adding project to quick link store.
-	if(window.location.href.indexOf('wucMutateProjectActivity.ascx') > 0) {
-		var add_block = document.createElement('div');
-		add_block.style.float = 'left';
-		add_block.id = 'add_block';
-		add_block.innerHTML = ''; //div will be filled by printAddButton
-		$('.wucMutateButtons').append(add_block);
-
-		(function() {
-			chrome.storage.sync.get("Acknowledge.links", function(r) {
-				var links = r["Acknowledge.links"];
-
-				if(links == undefined) {
-					console.log('no Groups');
-				} else {
-					printAddButton(r["Acknowledge.links"]);
-					// add trigger here, due to repaint options
-					$('.add_project_to_group_button:not(.disabled)').live('click', AddProjectToGroup);
-				}
-
-			});
-
-			chrome.storage.onChanged.addListener(function(changes, namespace) {
-				for (key in changes) {
-					if (key == "Acknowledge.links") {
-						var storageChange = changes[key];
-						printAddButton(storageChange.newValue);
-					}
-				}
-			});
-
-		})();
 	}
 })();
 
