@@ -52,8 +52,19 @@
 		// activate Event listeners for Chrome data
 		$.fn.urenFix.activateEventListeners();
 
+		// change window open type
+		$.setNeWindowToNewTab();
+
 		return this;
 	};
+
+	$.setNeWindowToNewTab = function() {
+		var updateScript = d.createElement('script');
+		updateScript.type = 'text/javascript';
+		updateScript.innerHTML = 'window.newWindow = function(url){window.open(url);}; ';
+
+		d.head.appendChild(updateScript);
+	}
 
 	$.fn.urenFix.loadData = function() {
 		// set start time from config
@@ -464,9 +475,3 @@ function setNewStartTime(duration_old_in_minutes) {
 		});
 	}
 })();
-
-var updateScript = document.createElement('script');
-updateScript.type = 'text/javascript';
-updateScript.innerHTML = 'window.newWindow = function(url){window.open(url);}; ';
-
-document.head.appendChild(updateScript);
