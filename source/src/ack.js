@@ -3,10 +3,11 @@
 (function ($, d, w, undefined) {
     // d = document, w= window, u = undefined
 
+	var is_debug_mode = true;
 
 	// default values
 	var _settings  = {
-		"start_time": "08:30:10",
+		"start_time": "08:30",
 		"time_increment": "900",
 		"projects": [
 					{
@@ -20,7 +21,10 @@
 				]
 	};
 
+	var set_duration_in_minutes = 0;
+
 	// keep track of loaded vars
+	// TODO: check if these variables are needed.
 	var _loaded = {
 		"projects": false,
 		"start_time": false,
@@ -40,8 +44,14 @@
 		'<img id="add_project_to_group_button"  class="add_project_to_group_button" src="Components/Images/btnNew26.gif" style="border-width:0px;padding-top:5px;margin-left:5px;" align="top" />'
 	}
 
+	$.debug = function (message) {
+		if (is_debug_mode) {
+			console.log(message);
+		}
+	}
+
 	$.fn.urenFix = function( options ) {
-		console.log('call');
+		$.debug('UrenFix Start');
 
 		// overide defaults
 		_settings = $.extend(_settings, options );
@@ -58,11 +68,14 @@
 		// make inputfield usefull
 		$.makeHTML5();
 
+		$.addAutoSetTime();
 		return this;
 	};
 
 	// change the newwindow function to open a new tab instead of a new pop-up
 	$.setNeWindowToNewTab = function() {
+		$.debug('setNeWindowToNewTab');
+
 		var updateScript = d.createElement('script');
 		updateScript.type = 'text/javascript';
 		updateScript.innerHTML = 'window.newWindow = function(url){window.open(url);}; ';
@@ -71,6 +84,8 @@
 	}
 
 	$.fn.urenFix.loadData = function() {
+		$.debug('loadData');
+
 		// set start time from config
 		chrome.storage.sync.get("start_time", function(r) {
 			var start_time = r["start_time"];
@@ -98,6 +113,8 @@
 	};
 
 	$.fn.urenFix.activateEventListeners = function() {
+		$.debug('activateEventListeners');
+
 		// add event listener
 		chrome.storage.onChanged.addListener(function(changes, namespace) {
 			for (key in changes) {
@@ -121,7 +138,9 @@
 	};
 
 	$.fn.urenFix.setStartTime = function(start_time) {
-		console.log('setStartTime');
+		$.debug('setStartTime');
+
+		// set value
 		_settings.start_time = start_time;
 		_loaded.start_time = true;
 
@@ -137,7 +156,9 @@
 	};
 
 	$.fn.urenFix.setTimeIncrement = function(time_increment) {
-		console.log('setTimeIncrement');
+		$.debug('setTimeIncrement');
+
+		// set value
 		_settings.time_increment = time_increment;
 		_loaded.time_increment = true;
 
@@ -148,7 +169,9 @@
 	};
 
 	$.fn.urenFix.setProjects = function(projects) {
-		console.log('setProjects');
+		$.debug('setProjects');
+
+		// set value
 		_settings.projects = projects;
 		_loaded.projects = true;
 
@@ -157,7 +180,7 @@
 	};
 
 	$.fn.urenFix.printLinks = function () {
-		console.log('printLinks');
+		$.debug('printLinks');
 
 		// only on the correct pages
 		if (document.getElementById('ctl00_cphContent_trFilter') != undefined) {
@@ -186,7 +209,7 @@
 	}
 
 	$.fn.urenFix.printAddButton = function() {
-		console.log('printAddButton');
+		$.debug('printAddButton');
 
 		// make sure where on project page
 		if(w.location.href.indexOf('wucMutateProjectActivity.ascx') > 0) {
@@ -211,11 +234,11 @@
 			// add trigger here, due to repaint options
 			// TODO: fix double binding of event, now every time this function is called the group is added
 			// reproduce by adding a project and then selecting no group but clicking add
-			$('.add_project_to_group_button:not(.disabled)').live('click', $.fn.urenFix.AddProjectToGroup);
+			$('.add_project_to_group_button:not(.disabled)').live('click', $.AddProjectToGroup);
 		}
 	}
 
-	$.fn.urenFix.getParameterByName = function(name) {
+	$.getParameterByName = function(name) {
 		name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
 		var regexS = "[\\?&]" + name + "=([^&#]*)";
 		var regex = new RegExp(regexS);
@@ -227,19 +250,21 @@
 		}
 	};
 
-	$.fn.urenFix.AddProjectToGroup = function() {
+	$.AddProjectToGroup = function() {
+		$.debug('AddProjectToGroup');
+
 		// prevent double
 		$(this).addClass('disabled');
 
 		// get project id
-		var project_id = document.getElementById('ctl00_cphContent_ctl00_txtProNo_txtTextBox').value;
+		var project_id = d.getElementById('ctl00_cphContent_ctl00_txtProNo_txtTextBox').value;
 
 		// get project_name = [{company name}] {project description}
-		var select_box = document.getElementById('ctl00_cphContent_ctl00_ddlCustomers_ddlDropDownList');
+		var select_box = d.getElementById('ctl00_cphContent_ctl00_ddlCustomers_ddlDropDownList');
 		var project_name = '[ ' + select_box.options[select_box.selectedIndex].text + ' ]  ' + $('#ctl00_cphContent_ctl00_txtDescription_txtTextBox').val();
 
 		// project KEY
-		var project_key = $().urenFix.getParameterByName('Key');
+		var project_key = $.getParameterByName('Key');
 
 		// group name
 		var group_name = $('#add_project_to_group').val();
@@ -271,6 +296,8 @@
 	};
 
 	$.makeHTML5 = function() {
+		$.debug('makeHTML5');
+
 		// add date picker to date field
 		if (d.getElementById('ctl00_cphContent_ctl00_txtDate_txtTextBox') !=  undefined) {
 			$.datepicker.setDefaults($.datepicker.regional[ "nl" ] );
@@ -286,7 +313,7 @@
 				// add html5 time input field
 				$("<input type='time' />").attr({
 						name: this.name,
-						value: makeValidTime(this.value),
+						value: $.makeValidTime(this.value),
 						id: field_id+ "_html5",
 						step:_settings.time_increment,
 						autocomplete: 'off'
@@ -302,170 +329,145 @@
 		}
 	};
 
+
+	$.getToday = function() {
+		var today_date = new Date();
+		var day = today_date.getDate();
+		var month = today_date.getMonth()+1;
+
+		if ((new String(day)).length <2) {
+				day = '0'+day;
+		}
+		if ((new String(month)).length <2) {
+				month = '0'+month;
+		}
+
+		var today_string =  day +'-'+ month +'-'+ today_date.getFullYear();
+
+		return today_string;
+	};
+
+	$.setNewStartTime = function() {
+		$.debug('setNewStartTime');
+
+		var duration_in_minutes = $.inputToMinutes($('#ctl00_cphContent_ctl00_txtDuration_txtTextBox').val());
+		var start_time_in_minutes = $.inputToMinutes($('#ctl00_cphContent_ctl00_txtTime_txtTextBox').val());
+		var date = $('#ctl00_cphContent_ctl00_txtDate_txtTextBox').val();
+
+		// Convert minutes to hour string
+		// TODO: fix 510 minutes check, what is 510 minuts
+		if ((set_duration_in_minutes != '0' || start_time_in_minutes == 510) && date == $.getToday() ) {
+			if (start_time_in_minutes == 510) {
+				start_time_in_minutes = ((new Date()).getHours()* 60) + (new Date()).getMinutes();
+			}
+			// calculate new minute (start time - diff between old & new duration)
+			var new_start_time_in_minutes = start_time_in_minutes - (duration_in_minutes - set_duration_in_minutes);
+
+			var hour_string = $.minutesToHourString(new_start_time_in_minutes)
+
+			$.debug('new value:' + hour_string);
+
+			$('#ctl00_cphContent_ctl00_txtTime_txtTextBox').val(hour_string);
+			$('#ctl00_cphContent_ctl00_txtTime_txtTextBox_html5').val($.makeValidTime(hour_string));
+
+			set_duration_in_minutes = duration_in_minutes; // replace old value
+		} else {
+			$.debug('No time set ' + set_duration_in_minutes + ' ' + start_time_in_minutes + ' ' +$.getToday());
+		}
+
+		return set_duration_in_minutes;
+	};
+
+
+	$.makeValidTime = function(old_time) {
+		var parts = old_time.split(':');
+		var hours, minutes, seconds;
+
+		// hours
+		if (parts.length >= 1) {
+			hours = ( (parts[0] < 10 && parts[0].length < 2) ? "0" : "" ) + parts[0];
+		} else {
+			hours = '00';
+		}
+
+		// minutes
+		if (parts.length >= 2) {
+			minutes = ( (parts[1] < 10 && parts[1].length < 2) ? "0" : "" ) + parts[1];
+		} else {
+			minutes = '00';
+		}
+
+		// seconds
+		if (parts.length >= 3) {
+			seconds = ( (parts[2] < 10 && parts[2].length < 2) ? "0" : "" ) + parts[2];
+		} else {
+			seconds = '00';
+		}
+
+		// return time string
+		return hours + ":" + minutes + ":" + seconds;
+	};
+
+	$.inputToMinutes = function(time_input) {
+		var time_in_minutes = '';
+
+		if (time_input.indexOf(':') > 0) {
+			var parts = time_input.split(":");
+			time_in_minutes = parseInt(parts[0] * 60) + parseInt(parts[1]);
+		} else if (time_input.indexOf(',') > 0) {
+			// {h},{%} -> h}.{%}
+			time_in_minutes = time_input.replace(",", ".") * 60;
+		} else {
+			// {h} -> {h}.0
+			// {h}.{%}
+			time_in_minutes = time_input * 60;
+		}
+
+		return time_in_minutes;
+	};
+
+
+	$.minutesToHourString = function(minutes) {
+		if (minutes > 0) {
+			var worked_hours = Math.floor( minutes / 60);
+			var worked_minutes = minutes % 60;
+
+			if ((new String(worked_minutes)).length <2) {
+				worked_minutes = '0'+worked_minutes;
+			}
+			return worked_hours + ':' + worked_minutes;
+		} else {
+			return '';
+		}
+	};
+
+	$.addAutoSetTime = function() {
+		if (d.getElementById('ctl00_cphContent_ctl00_txtDate_txtTextBox')
+			&& $.getParameterByName('ForceAction') != ''
+			&& $.getParameterByName('Call') == 'wucMutateProjectLineActivity.ascx') {
+
+			$('#ctl00_cphContent_ctl00_txtDuration_txtTextBox').keyup(function (e) {
+				if (e.ctrlKey && e.keyCode == 13) {
+				  // Ctrl-Enter pressed
+				  // set new time
+				  $.setNewStartTime();
+				}
+			});
+		}
+
+		jQuery.each(['txtDate_txtTextBox', 'txtTime_txtTextBox', 'txtDuration_txtTextBox'], function(i,val) {
+			$('#ctl00_cphContent_ctl00_' + val).keypress(function(e){
+					// cancel enter key
+					var key = e.which || e.keyCode;
+					if (key == 13) { // 13 is enter
+						$(val).focus();
+						return false;
+					}
+				});
+		});
+	};
+
 } (jQuery, document, window));
 
 $().urenFix({});
 
-
-
-function inputToMinutes(time_input) {
-	var time_in_minutes = '';
-	if (time_input.indexOf(':') > 0) {
-		var parts = time_input.split(":");
-		time_in_minutes = parseInt(parts[0] * 60) + parseInt(parts[1]);
-	} else if (time_input.indexOf(',') > 0) {
-		// {h},{%} -> h}.{%}
-		time_in_minutes = time_input.replace(",", ".") * 60;
-	} else {
-		// {h} -> {h}.0
-		// {h}.{%}
-		time_in_minutes = time_input * 60;
-	}
-
-	return time_in_minutes;
-}
-
-function minutesToHourString(minutes) {
-	if (minutes > 0) {
-		var worked_hours = Math.floor( minutes / 60);
-		var worked_minutes = minutes % 60;
-
-		if ((new String(worked_minutes)).length <2) {
-			worked_minutes = '0'+worked_minutes;
-		}
-		return worked_hours + ':' + worked_minutes;
-	} else {
-		return '';
-	}
-}
-
-function makeValidTime(old_time) {
-	var parts = old_time.split(':');
-	var hours, minutes, seconds;
-	if (parts.length >= 1) {
-		hours = ( (parts[0] < 10 && parts[0].length < 2) ? "0" : "" ) + parts[0];
-	} else {
-		hours = '00';
-	}
-
-
-	if (parts.length >= 2) {
-		minutes = ( (parts[1] < 10 && parts[1].length < 2) ? "0" : "" ) + parts[1];
-	} else {
-		minutes = '00';
-	}
-
-
-	if (parts.length >= 3) {
-		seconds = ( (parts[2] < 10 && parts[2].length < 2) ? "0" : "" ) + parts[2];
-	} else {
-		seconds = '00';
-	}
-
-	return hours + ":" + minutes + ":" + seconds;
-}
-
-function today() {
-	var today_date = new Date();
-	var day = today_date.getDate();
-	var month = today_date.getMonth()+1;
-
-	if ((new String(day)).length <2) {
-			day = '0'+day;
-	}
-	if ((new String(month)).length <2) {
-			month = '0'+month;
-	}
-
-	var today_string =  day +'-'+ month +'-'+ today_date.getFullYear();
-
-	return today_string;
-}
-
-function setNewStartTime(duration_old_in_minutes) {
-	console.log('Try set time');
-	var duration_in_minutes = inputToMinutes($('#ctl00_cphContent_ctl00_txtDuration_txtTextBox').val());
-	var start_time_in_minutes = inputToMinutes($('#ctl00_cphContent_ctl00_txtTime_txtTextBox').val());
-	var date = $('#ctl00_cphContent_ctl00_txtDate_txtTextBox').val();
-
-
-
-	// Convert minutes to hour string
-	if ((duration_old_in_minutes != '0' || start_time_in_minutes == 510) && date == today() ) {
-		if (start_time_in_minutes == 510) {
-			start_time_in_minutes = ((new Date()).getHours()* 60) + (new Date()).getMinutes();
-		}
-		// calculate new minute (start time - diff between old & new duration)
-		var new_start_time_in_minutes = start_time_in_minutes - (duration_in_minutes - duration_old_in_minutes);
-
-		var hour_string = minutesToHourString(new_start_time_in_minutes)
-		console.log('new value:' + hour_string);
-		$('#ctl00_cphContent_ctl00_txtTime_txtTextBox').val(hour_string);
-		$('#ctl00_cphContent_ctl00_txtTime_txtTextBox_html5').val(makeValidTime(hour_string));
-
-		duration_old_in_minutes = duration_in_minutes; // replace old value
-	} else {
-		console.log('No time set ' + duration_old_in_minutes + ' ' + start_time_in_minutes + ' ' +today());
-	}
-	return duration_old_in_minutes;
-}
-
-
-(function() {
-
-	if (document.getElementById('ctl00_cphContent_ctl00_txtDate_txtTextBox')
-		&& getParameterByName('ForceAction') != ''
-		&& getParameterByName('Call') == 'wucMutateProjectLineActivity.ascx') {
-
-		$('#ctl00_cphContent_ctl00_txtDate_txtTextBox').keypress(function(e){
-			// cancel enter key
-			var key = e.which || e.keyCode;
-			if (key == 13) { // 13 is enter
-				$('#ctl00_cphContent_ctl00_txtTime_txtTextBox').focus();
-				return false;
-			}
-		});
-		$('#ctl00_cphContent_ctl00_txtTime_txtTextBox').keypress(function(e){
-			// cancel enter key
-			var key = e.which || e.keyCode;
-			if (key == 13) { // 13 is enter
-				$('#ctl00_cphContent_ctl00_txtDuration_txtTextBox').focus();
-				return false;
-			}
-		});
-		$('#ctl00_cphContent_ctl00_txtDuration_txtTextBox').keypress(function(e){
-			// cancel enter key
-			var key = e.which || e.keyCode;
-			if (key == 13) { // 13 is enter
-				$('#ctl00_cphContent_ctl00_txtDescription_txtTextBox').focus();
-				return false;
-			}
-		});
-
-
-		var duration_timer;
-		var duration_old_in_minutes = inputToMinutes($('#ctl00_cphContent_ctl00_txtDuration_txtTextBox').val());
-		$('#ctl00_cphContent_ctl00_txtDuration_txtTextBox').keyup(function(e){
-			// options
-			// {h} -> {h}.0
-			// {h}:{m}
-			// {h},{%} -> {h}.{%}
-			// {h}.{%}
-			clearTimeout(duration_timer); // reset timer
-
-			var key = e.which || e.keyCode;
-			if (key == 13) { // 13 is enter
-				duration_old_in_minutes = setNewStartTime(duration_old_in_minutes);
-				return true;
-			} else if(key == 27) { // 27 is esc
-				//duration_old_in_minutes= setNewStartTime(duration_old_in_minutes);
-				return true;
-			} else {
-				duration_timer = setTimeout(function() {
-					duration_old_in_minutes = setNewStartTime(duration_old_in_minutes);
-				}, 1000);
-			}
-
-		});
-	}
-})();
