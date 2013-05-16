@@ -353,11 +353,12 @@
 		var duration_in_minutes = $.inputToMinutes($('#ctl00_cphContent_ctl00_txtDuration_txtTextBox').val());
 		var start_time_in_minutes = $.inputToMinutes($('#ctl00_cphContent_ctl00_txtTime_txtTextBox').val());
 		var date = $('#ctl00_cphContent_ctl00_txtDate_txtTextBox').val();
+		// start time. only set new time is start time is default start time
+		var default_start_time_in_minutes = $.inputToMinutes(_settings.start_time);
 
 		// Convert minutes to hour string
-		// TODO: fix 510 minutes check, what is 510 minuts
-		if ((set_duration_in_minutes != '0' || start_time_in_minutes == 510) && date == $.getToday() ) {
-			if (start_time_in_minutes == 510) {
+		if ((set_duration_in_minutes != '0' || start_time_in_minutes == default_start_time_in_minutes) && date == $.getToday() ) {
+			if (start_time_in_minutes == default_start_time_in_minutes) {
 				start_time_in_minutes = ((new Date()).getHours()* 60) + (new Date()).getMinutes();
 			}
 			// calculate new minute (start time - diff between old & new duration)
@@ -429,6 +430,10 @@
 
 	$.minutesToHourString = function(minutes) {
 		if (minutes > 0) {
+			// round minutes to nearest stepping size
+			var step = (_settings.time_increment/60);
+			minutes = (Math.round(minutes/step) * step);
+
 			var worked_hours = Math.floor( minutes / 60);
 			var worked_minutes = minutes % 60;
 
