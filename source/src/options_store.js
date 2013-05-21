@@ -139,6 +139,7 @@
 		});
 
 
+		//TODO: rewrite to use function
 		// dell group button
 		$('.del_group:not(.disabled)').live('click', function() {
 			$.debug('Del group');
@@ -157,6 +158,7 @@
 
 
 
+		//TODO: rewrite to use function
 		// dell project button
 		$('.del_project:not(.disabled)').live('click', function() {
 			$.debug('Del project');
@@ -226,6 +228,8 @@
 
 	$.toTree = function() {
 		$.debug('toTree');
+
+		//TODO: rewrite to template
 		var html = '<ul id="tree_ul">';
 		jQuery.each(_settings.projects, function(group_i,group) {
 			// group
@@ -258,6 +262,7 @@
 		$('#edit_'+group_id+'_icon').toggle();
 		var value = $('#'+group_id).html(); // grab current html value
 
+		//TODO: rewrite to template
 		var html = '<input type="text" id="input_'+group_id+'" value="'+value+'">';
 		html += ' <span id="save_'+group_id+'"> <img src="../icons/save.png" /> '+chrome.i18n.getMessage('i18n_save')+'</span>';
 
@@ -285,6 +290,7 @@
 		$('#edit_'+project_id+'_icon').toggle();
 		var value = $('#'+project_id).html(); // grab current html value
 
+		//TODO: rewrite to template
 		var html = '<input type="text" id="input_'+project_id+'" value="'+value+'">';
 		html += ' <span id="save_'+project_id+'"> <img src="../icons/save.png" /> <strong>'+chrome.i18n.getMessage('i18n_save')+'</strong></span>';
 
@@ -338,10 +344,14 @@
 
 		var options = {};
 		var save_options = false;
+
+		//TODO: rewrite to  use object
 		if ($('#time_increment')) {
 			options.time_increment = $('#time_increment').val() * 60;
 			save_options = true;
 		}
+
+		//TODO: rewrite to  use object
 		if ($('#start_time')) {
 			options.start_time = $('#start_time').val();
 			save_options = true;
