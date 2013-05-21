@@ -135,6 +135,29 @@
 				}
 			}
 		});
+
+		// page repaint due to ajax
+
+		// fix encapsulation by chrome
+		// add event listener on dom
+		// trigger custom dom event.
+		 document.addEventListener("needRepaint", function(){
+			$.repaint();
+		}, false);
+
+
+		//window.Sys.WebForms.PageRequestManager.getInstance().add_endRequest($.repaint());
+		var updateScript = d.createElement('script');
+		updateScript.type = 'text/javascript';
+		updateScript.innerHTML = 'Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function(sender, args){ var evt = document.createEvent("Event"); evt.initEvent("needRepaint", true, false); document.dispatchEvent(evt);});';
+
+		d.head.appendChild(updateScript);
+	};
+
+	$.repaint = function() {
+		$.debug('repaint');
+
+		$.fn.urenFix.printLinks();
 	};
 
 	$.fn.urenFix.setStartTime = function(start_time) {
@@ -290,10 +313,15 @@
 		if (!is_succes) {
 			alert(chrome.i18n.getMessage('i18n_failed_to_add')+'!');
 		} else {
-			storeLinks(_settings.projects);
+			$.storeProjects();
 			alert(chrome.i18n.getMessage('i18n_successful_project_add', [project_name, group_name]) +'.');
 		}
 	};
+
+
+	$.storeProjects = function() {
+		chrome.storage.sync.set({"Acknowledge.links": _settings.projects}, function() { $.debug('saved: Projects');});
+	}
 
 	$.makeHTML5 = function() {
 		$.debug('makeHTML5');
@@ -472,7 +500,8 @@
 		});
 	};
 
+//	Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function(sender, args){console.log('event'});';
+
 } (jQuery, document, window));
 
 $().urenFix({});
-

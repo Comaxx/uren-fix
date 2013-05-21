@@ -29,22 +29,20 @@
 		<p><a href="#" id="advanced_option_link" i18n="i18n_advanced_options">Advanced options</a></p>
 		<div id="advanced_info"style="display: none;">
 			<h2 i18n="i18n_advanced_options">Advanced options</h2>
-			<label for="config">Project config</label>
-			<textarea id="config"></textarea><br /><br />
 			<label for="time_increment">Time increment (in minutes)</label>
 			<input type="text" id="time_increment" value="" /><br />
 			<label for="start_time">Start time</label>
 			<input type="time" id="start_time" value="" step="900" /><br />
+			<label for="config">Project config</label><br />
+			<textarea id="config" disabled="disabled"></textarea><br />
 			<button id="save" i18n="i18n_save">Save</button>
 			<div id="status"></div>
 		</div>
 
 	</div>
 
-
-	<script src="store.js"></script>
 	<script src="../js/jquery-1.8.3.min.js"></script>
-	<script src="options.js"></script>
+    <script src="options_store.js"></script>
 </body>
 
 </html>

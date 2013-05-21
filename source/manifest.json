@@ -27,7 +27,6 @@
 		"js/jquery-1.8.3.min.js",
 		"js/jquery-ui-1.10.2.custom.min.js",
 		"js/jquery.ui.datepicker-nl.js",
-		"src/store.js",
         "src/ack.js",
 		"css/popup.css"
       ],
