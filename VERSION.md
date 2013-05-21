@@ -1,6 +1,10 @@
 Uren-Fix
 ========
 
+Uren-Fix 1.4.3
+--------
+- fixed to disappearance of project list when using form functions
+- changed code to jquery plugin
 
 
 Uren-Fix 1.4.2
