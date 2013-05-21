@@ -3,12 +3,12 @@
 (function ($, d, w, undefined) {
     // d = document, w= window, u = undefined
 
-	var is_debug_mode = true;
+	var is_debug_mode = false;
 
 	// default values
 	var _settings  = {
 		"start_time": "08:30",
-		"time_increment": "900",
+		"time_increment": 900,
 		"projects": [
 					{
 						name: 'Overhead',
@@ -181,6 +181,9 @@
 	$.fn.urenFix.setTimeIncrement = function(time_increment) {
 		$.debug('setTimeIncrement');
 
+		if (time_increment < 1) {
+			time_increment = 900;
+		}
 		// set value
 		_settings.time_increment = time_increment;
 		_loaded.time_increment = true;
@@ -484,6 +487,7 @@
 				  // Ctrl-Enter pressed
 				  // set new time
 				  $.setNewStartTime();
+				  $('#ctl00_cphContent_ctl00_txtDescription_txtTextBox').focus();
 				}
 			});
 		}
