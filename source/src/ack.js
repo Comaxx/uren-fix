@@ -3,7 +3,7 @@
 (function ($, d, w, undefined) {
     // d = document, w= window, u = undefined
 
-	var is_debug_mode = true;
+	var is_debug_mode = false;
 
 	// default values
 	var _settings  = {
