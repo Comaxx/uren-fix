@@ -9,6 +9,8 @@
 	var _settings  = {
 		"start_time": "08:30",
 		"time_increment": 900,
+		"start_date" : undefined,
+		"start_date_set_at" : undefined,
 		"projects": [
 					{
 						name: 'Overhead',
@@ -22,14 +24,6 @@
 	};
 
 	var set_duration_in_minutes = 0;
-
-	// keep track of loaded vars
-	// TODO: check if these variables are needed.
-	var _loaded = {
-		"projects": false,
-		"start_time": false,
-		"time_increment": false
-	};
 
 	var _templates = {
 		"project_links" : '<h1>Comaxx Uren Fix</h1>{{#groups}}<b>{{name}}</b><ul>' +
@@ -57,7 +51,7 @@
 		_settings = $.extend(_settings, options );
 
 		// load Chrome data
-		$.fn.urenFix.loadData();
+		$.loadData();
 
 		// activate Event listeners for Chrome data
 		$.fn.urenFix.activateEventListeners();
@@ -83,22 +77,35 @@
 		d.head.appendChild(updateScript);
 	}
 
-	$.fn.urenFix.loadData = function() {
+	$.loadData = function() {
 		$.debug('loadData');
 
 		// set start time from config
 		chrome.storage.sync.get("start_time", function(r) {
 			var start_time = r["start_time"];
 			if (start_time != undefined) {
-				$.fn.urenFix.setStartTime(start_time);
-				_loaded.start_time = true;
+				$.setStartTime(start_time);
 			}
 		});
 
 		chrome.storage.sync.get("time_increment", function(r) {
 			var time_increment = r["time_increment"];
 			if (time_increment != undefined) {
-				$.fn.urenFix.setTimeIncrement(time_increment);
+				$.setTimeIncrement(time_increment);
+			}
+		});
+
+		chrome.storage.sync.get("start_date", function(r) {
+			var start_date = r["start_date"];
+			if (start_date != undefined) {
+				$.setStartDate(start_date);
+			}
+		});
+
+		chrome.storage.sync.get("start_date_set_at", function(r) {
+			var start_date_set_at = r["start_date_set_at"];
+			if (start_date_set_at != undefined) {
+				$.setStartDateSetAt(start_date_set_at);
 			}
 		});
 
@@ -122,11 +129,19 @@
 				// time increment
 				if (key == "time_increment") {
 					var storageChange = changes[key];
-					$.fn.urenFix.setTimeIncrement(storageChange.newValue);
+					$.setTimeIncrement(storageChange.newValue);
 				// start time
 				} else if (key == "start_time") {
 					var storageChange = changes[key];
-					$.fn.urenFix.setStartTime(storageChange.newValue);
+					$.setStartTime(storageChange.newValue);
+				// start date
+				} else if (key == "start_date") {
+					var storageChange = changes[key];
+					$.setStartDate(storageChange.newValue);
+				// start date set at
+				} else if (key == "start_date_set_at") {
+					var storageChange = changes[key];
+					$.setStartDateSetAt(storageChange.newValue);
 				} else if (key == "Acknowledge.links") {
 					var storageChange = changes[key];
 					$.fn.urenFix.setProjects(storageChange.newValue);
@@ -160,12 +175,11 @@
 		$.fn.urenFix.printLinks();
 	};
 
-	$.fn.urenFix.setStartTime = function(start_time) {
+	$.setStartTime = function(start_time) {
 		$.debug('setStartTime');
 
 		// set value
 		_settings.start_time = start_time;
-		_loaded.start_time = true;
 
 		// html5 field
 		if ($('#ctl00_cphContent_ctl00_txtTime_txtTextBox_html5') != undefined) {
@@ -178,7 +192,7 @@
 		}
 	};
 
-	$.fn.urenFix.setTimeIncrement = function(time_increment) {
+	$.setTimeIncrement = function(time_increment) {
 		$.debug('setTimeIncrement');
 
 		if (time_increment < 1) {
@@ -186,7 +200,6 @@
 		}
 		// set value
 		_settings.time_increment = time_increment;
-		_loaded.time_increment = true;
 
 		// update fields if needed
 		if ($('#ctl00_cphContent_ctl00_txtTime_txtTextBox_html5') != undefined) {
@@ -194,12 +207,58 @@
 		}
 	};
 
+	$.setStartDate = function(start_date, is_new) {
+		$.debug('setStartDate');
+
+		if (start_date == undefined) {
+			start_date = $.getToday();
+		}
+
+		// set value
+		_settings.start_date = start_date;
+
+		if (is_new === true) {
+			$.setStartDateSetAt(new Date() / 1000);
+		}
+		$.repaintStartDate();
+	};
+
+	$.setStartDateSetAt = function(start_date_set_at) {
+		$.debug('setStartDateSetAt');
+
+		// set value
+		_settings.start_date_set_at = start_date_set_at;
+
+		$.repaintStartDate();
+	};
+
+	$.repaintStartDate = function() {
+		$.debug('repaintStartDate');
+
+		var now = new Date() / 1000;
+		var start_date = undefined;
+
+		// if start_date_set_at < now - 0.5 hours // reset start_date to now and invalidate start_date_set_at
+		if (_settings.start_date_set_at == undefined) {
+			start_date = $.getToday();
+		} else if ((now - 60* 60*0.5)> _settings.start_date_set_at) {
+			// invalid
+			start_date = $.getToday();
+		} else {
+			start_date = _settings.start_date;
+		}
+
+		// 24/7 field
+		if ($('#ctl00_cphContent_ctl00_txtDate_txtTextBox') != undefined) {
+			$('#ctl00_cphContent_ctl00_txtDate_txtTextBox').val(start_date);
+		}
+	}
+
 	$.fn.urenFix.setProjects = function(projects) {
 		$.debug('setProjects');
 
 		// set value
 		_settings.projects = projects;
-		_loaded.projects = true;
 
 		// update links
 		$.fn.urenFix.printLinks();
@@ -326,13 +385,38 @@
 		chrome.storage.sync.set({"Acknowledge.links": _settings.projects}, function() { $.debug('saved: Projects');});
 	}
 
+	$.storeStartDate = function(start_date) {
+		chrome.storage.sync.set({
+			"start_date": _settings.start_date,
+			"start_date_set_at": _settings.start_date_set_at
+		}, function() { $.debug('saved: start_date');});
+	}
+
+	$.changeStartDate = function(date) {
+		$.setStartDate(date, true); // cause double repaint, but set the value
+		$.storeStartDate();
+
+		// set time out to change back to undifined
+	};
+
 	$.makeHTML5 = function() {
 		$.debug('makeHTML5');
 
 		// add date picker to date field
 		if (d.getElementById('ctl00_cphContent_ctl00_txtDate_txtTextBox') !=  undefined) {
 			$.datepicker.setDefaults($.datepicker.regional[ "nl" ] );
-			$( "#ctl00_cphContent_ctl00_txtDate_txtTextBox" ).datepicker();
+
+			// bind on change to date picker
+			$( "#ctl00_cphContent_ctl00_txtDate_txtTextBox" ).datepicker(
+				{
+					onSelect: function(value){$.changeStartDate(value);}
+				}
+			);
+
+			// bind on change to input field
+			$("#ctl00_cphContent_ctl00_txtDate_txtTextBox").change(function(){
+				$.changeStartDate($("#ctl00_cphContent_ctl00_txtDate_txtTextBox").val());
+			});
 
 		}
 
@@ -503,8 +587,6 @@
 				});
 		});
 	};
-
-//	Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function(sender, args){console.log('event'});';
 
 } (jQuery, document, window));
 
