@@ -3,7 +3,7 @@
 (function ($, d, w, undefined) {
     // d = document, w= window, u = undefined
 
-	var is_debug_mode = false;
+	var is_debug_mode = true;
 
 	// default values
 	var _settings  = {
@@ -54,7 +54,7 @@
 		$.loadData();
 
 		// activate Event listeners for Chrome data
-		$.fn.urenFix.activateEventListeners();
+		$.activateEventListeners();
 
 		// change window open type
 		$.setNeWindowToNewTab();
@@ -112,14 +112,14 @@
 		chrome.storage.sync.get("Acknowledge.links", function(r) {
 				var links = r["Acknowledge.links"];
 				if(links != undefined) {
-					$.fn.urenFix.setProjects(r["Acknowledge.links"]);
-					$.fn.urenFix.printAddButton();
+					$.setProjects(r["Acknowledge.links"]);
+					$.printAddButton();
 				}
 
 			});
 	};
 
-	$.fn.urenFix.activateEventListeners = function() {
+	$.activateEventListeners = function() {
 		$.debug('activateEventListeners');
 
 		// add event listener
@@ -144,8 +144,8 @@
 					$.setStartDateSetAt(storageChange.newValue);
 				} else if (key == "Acknowledge.links") {
 					var storageChange = changes[key];
-					$.fn.urenFix.setProjects(storageChange.newValue);
-					$.fn.urenFix.printAddButton();
+					$.setProjects(storageChange.newValue);
+					$.printAddButton();
 
 				}
 			}
@@ -172,7 +172,7 @@
 	$.repaint = function() {
 		$.debug('repaint');
 
-		$.fn.urenFix.printLinks();
+		$.printLinks();
 	};
 
 	$.setStartTime = function(start_time) {
@@ -254,17 +254,17 @@
 		}
 	}
 
-	$.fn.urenFix.setProjects = function(projects) {
+	$.setProjects = function(projects) {
 		$.debug('setProjects');
 
 		// set value
 		_settings.projects = projects;
 
 		// update links
-		$.fn.urenFix.printLinks();
+		$.printLinks();
 	};
 
-	$.fn.urenFix.printLinks = function () {
+	$.printLinks = function () {
 		$.debug('printLinks');
 
 		// only on the correct pages
@@ -293,7 +293,7 @@
 		}
 	}
 
-	$.fn.urenFix.printAddButton = function() {
+	$.printAddButton = function() {
 		$.debug('printAddButton');
 
 		// make sure where on project page
@@ -362,7 +362,6 @@
 		}
 
 		// save
-
 		var is_succes = false;
 		jQuery.each(_settings.projects, function(i,val) {
 			if (val.name == group_name) {
