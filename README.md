@@ -15,3 +15,4 @@ Fetures
 - set start time relative to now by crtl+enter
 - change defaultstart time
 - set time increment for time field
+- remember registration date for 30 minutes

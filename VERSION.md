@@ -1,6 +1,10 @@
 Uren-Fix
 ========
 
+Uren-Fix 1.5.0
+--------
+- Add support for remembering working date for 30 minutes
+
 Uren-Fix 1.4.3
 --------
 - fixed to disappearance of project list when using form functions
