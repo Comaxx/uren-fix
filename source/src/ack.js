@@ -249,7 +249,7 @@
 		}
 
 		// 24/7 field
-		if ($('#ctl00_cphContent_ctl00_txtDate_txtTextBox') != undefined) {
+		if ($('#ctl00_cphContent_ctl00_txtDate_txtTextBox') != undefined && $.getParameterByName('ForceAction') == 'New') {
 			$('#ctl00_cphContent_ctl00_txtDate_txtTextBox').val(start_date);
 		}
 	}
@@ -420,7 +420,7 @@
 		}
 
 		// convert time input to html5 time input.
-		if (d.getElementById('ctl00_cphContent_ctl00_txtTime_txtTextBox') !=  undefined) {
+		/*if (d.getElementById('ctl00_cphContent_ctl00_txtTime_txtTextBox') !=  undefined) {
 			$('#ctl00_cphContent_ctl00_txtTime_txtTextBox').each(function() {
 				var field_id = $(this).attr('id');
 
@@ -440,7 +440,7 @@
 				$(this).hide();
 			});
 
-		}
+		}*/
 	};
 
 
