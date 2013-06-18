@@ -1,6 +1,11 @@
 Uren-Fix
 ========
 
+Uren-Fix 1.5.1
+--------
+- Fixed issues with remembering of date value
+- Removed HTML 5 input due to AM/PM formate
+
 Uren-Fix 1.5.0
 --------
 - Add support for remembering working date for 30 minutes
