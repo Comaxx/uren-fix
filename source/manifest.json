@@ -1,9 +1,9 @@
 {
   "name": "Comaxx Uren fix",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "manifest_version": 2,
   "description": "Voor als nummers opzoeken je dag taak is....",
-  "homepage_url": "http://acknowledge.nl",
+  "homepage_url": "https://acknowledge.nl",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
@@ -13,14 +13,14 @@
   "options_page": "src/options.html",
 
   "permissions": [
-    "http://uren.acknowledge.nl/*",
+    "https://uren.acknowledge.nl/*",
     "tabs",
 	"storage"
   ],
   "content_scripts": [
     {
       "matches": [
-        "http://uren.acknowledge.nl/*"
+        "https://uren.acknowledge.nl/*"
       ],
       "js": [
 		"js/mustache.js",
